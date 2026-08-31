@@ -55,6 +55,8 @@ import * as ToolGoal from '@deepseek-ai/dsh-tool-goal'
 import * as ToolSchedule from '@deepseek-ai/dsh-schedule'
 import Lsp from '@deepseek-ai/dsh-lsp'
 import * as ToolLsp from '@deepseek-ai/dsh-tool-lsp'
+import LspDiagnostics from '@deepseek-ai/dsh-lsp-diagnostics'
+import * as ToolLspDiagnostics from '@deepseek-ai/dsh-tool-lsp-diagnostics'
 import * as ToolSkill from '@deepseek-ai/dsh-tool-skill'
 import * as ToolSessionQuery from '@deepseek-ai/dsh-tool-session-query'
 import * as ToolTasks from '@deepseek-ai/dsh-tool-jobs'
@@ -407,6 +409,19 @@ const TOOL_PACKAGES: ToolPackage[] = [
     },
     note:
       'The lsp tool keeps provider selection and language-server subprocesses behind ctx.lsp, so its model-visible schema stays stable across providers. Requires a registered provider (e.g. `@deepseek-ai/dsh-lsp-stdio`) at runtime; without one, a query returns the structured `LSP_UNAVAILABLE` error rather than changing the schema.',
+  },
+  {
+    pkg: '@deepseek-ai/dsh-tool-lsp-diagnostics',
+    dir: 'tool-lsp-diagnostics',
+    source: 'packages/lsp/tool-lsp-diagnostics/src/index.ts',
+    requires: ['ctx.tools', 'ctx.lspDiagnostics', 'ctx.systemPrompt'],
+    writes: ['tool/call', 'tool/result'],
+    async mount(ctx) {
+      await ctx.plugin(LspDiagnostics)
+      await ctx.plugin(ToolLspDiagnostics)
+    },
+    note:
+      'The lsp-diagnostics tool keeps diagnostics selection and snapshot lifecycle behind ctx.lspDiagnostics, so its model-visible schema stays stable across providers. Requires a registered provider (e.g. `@deepseek-ai/dsh-lsp-stdio-diagnostics`) at runtime; without one, a pull returns the structured `LSP_UNAVAILABLE` error rather than changing the schema.',
   },
   {
     pkg: '@deepseek-ai/dsh-tool-ralph',

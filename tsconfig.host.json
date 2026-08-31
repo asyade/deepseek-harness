@@ -346,6 +346,9 @@
     { "path": "./packages/lsp/lsp" },
     { "path": "./packages/lsp/lsp-stdio" },
     { "path": "./packages/lsp/tool-lsp" },
+    { "path": "./packages/lsp/lsp-diagnostics" },
+    { "path": "./packages/lsp/lsp-stdio-diagnostics" },
+    { "path": "./packages/lsp/tool-lsp-diagnostics" },
     { "path": "./apps/cli" },
     { "path": "./apps/desktop-host" },
     { "path": "./apps/desktop" }

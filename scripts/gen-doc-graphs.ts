@@ -664,6 +664,15 @@ const SERVICE_ROLES: ServiceRole[] = [
     note: 'Provider registration and selection plus normalized query execution over exactly four operations; the seam offers no protocol escape hatch, so a backend translates into the normalized request and result.',
   },
   {
+    key: 'lspDiagnostics',
+    pkg: 'lsp-diagnostics',
+    title: 'LSP diagnostics push-feed seam',
+    mode: 'seam',
+    implementations: ['lsp-stdio-diagnostics'],
+    consumers: ['tool-lsp-diagnostics'],
+    note: 'Workspace-scoped diagnostics with persistent didOpen/didChange sync, hybrid push+pull merge, debounce, dedupe, and caps; provider selection is by canonical workspace root, not file extension.',
+  },
+  {
     key: 'dynamicCordisRunner',
     pkg: 'cordis-host-runner',
     title: 'Dynamic Cordis package host runner',

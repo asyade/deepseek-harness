@@ -1537,6 +1537,31 @@
       "source": "packages/lsp/lsp/src/types.ts"
     },
     {
+      "doc": "docs/subsystems/lsp.md",
+      "symbol": "LspDiagnostic",
+      "source": "packages/lsp/lsp-diagnostics/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/lsp.md",
+      "symbol": "LspDiagnosticsSnapshot",
+      "source": "packages/lsp/lsp-diagnostics/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/lsp.md",
+      "symbol": "LspDiagnosticsRequest",
+      "source": "packages/lsp/lsp-diagnostics/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/lsp.md",
+      "symbol": "LspDiagnosticsProvider",
+      "source": "packages/lsp/lsp-diagnostics/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/lsp.md",
+      "symbol": "LspDiagnosticsService",
+      "source": "packages/lsp/lsp-diagnostics/src/types.ts"
+    },
+    {
       "doc": "docs/subsystems/persistence.md",
       "symbol": "SessionPersistenceRevision",
       "source": "packages/session/session-persistence/src/revision.ts"
