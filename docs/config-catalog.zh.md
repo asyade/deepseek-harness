@@ -1497,6 +1497,51 @@ export interface LspLocalServerConfig {
 
 来源：[`packages/lsp/lsp-stdio/src/index.ts:82`](../packages/lsp/lsp-stdio/src/index.ts)
 
+<a id="deepseek-aidsh-lsp-stdio-diagnostics"></a>
+
+## `@deepseek-ai/dsh-lsp-stdio-diagnostics`
+
+需要：`fs` · `subprocess`
+
+```ts config-catalog
+/** Plugin configuration: one diagnostics server per stable provider id. */
+export interface Config {
+  /** Map of stable provider id to one server command; must contain at least one non-empty entry. */
+  servers: Record<string, LspDiagnosticsServerConfig>
+}
+
+/** One configured diagnostics server and its host bounds. */
+export interface LspDiagnosticsServerConfig {
+  /** Executable to spawn — absolute, or resolved on the child PATH at load; launched without a shell. */
+  command: string
+  /** Lowercase leading-dot extension → LSP language id (e.g. `{ '.ts': 'typescript' }`). */
+  extensionToLanguage: Record<string, string>
+  /** Arguments passed to the executable. */
+  args?: string[]
+  /**
+   * Extra env merged over the credential-scrubbed ambient env; variables matching
+   * `KEY`/`PASSWORD`/`SECRET`/`TOKEN` and all `DSH_*` names are not forwarded.
+   */
+  env?: Record<string, string>
+  /** Static `initialize` options forwarded to the server. */
+  initializationOptions?: unknown
+  /** Static answer to every `workspace/configuration` item. */
+  configuration?: unknown
+  /** Largest single framed message accepted from the server. */
+  maxMessageBytes?: number
+  /** Largest stderr tail retained for diagnostics. */
+  maxStderrBytes?: number
+  /** Largest source document accepted for sync. */
+  maxDocumentBytes?: number
+  /** Graceful `shutdown`/`exit` budget before escalation. */
+  shutdownTimeoutMs?: number
+  /** Request-cancel and SIGTERM→SIGKILL escalation grace. */
+  killGraceMs?: number
+}
+```
+
+来源：[`packages/lsp/lsp-stdio-diagnostics/src/index.ts:90`](../packages/lsp/lsp-stdio-diagnostics/src/index.ts)
+
 <a id="deepseek-aidsh-mcp-client"></a>
 
 ## `@deepseek-ai/dsh-mcp-client`
@@ -2863,6 +2908,28 @@ export interface Config {
 
 来源：[`packages/lsp/tool-lsp/src/index.ts:57`](../packages/lsp/tool-lsp/src/index.ts)
 
+<a id="deepseek-aidsh-tool-lsp-diagnostics"></a>
+
+## `@deepseek-ai/dsh-tool-lsp-diagnostics`
+
+需要：`tools` · `lspDiagnostics` · `systemPrompt`
+
+```ts config-catalog
+/** Plugin configuration: timeout budget and optional caps. */
+export interface Config {
+  /** Tool-call timeout budget in ms (default 10_000). */
+  timeoutMs?: number
+  /** Largest number of files in the result before omission (default 5). */
+  maxFiles?: number
+  /** Largest diagnostics per file before omission (default 20). */
+  maxPerFile?: number
+  /** Largest complete rendered result in characters (default 16_000). */
+  maxResultChars?: number
+}
+```
+
+来源：[`packages/lsp/tool-lsp-diagnostics/src/index.ts:53`](../packages/lsp/tool-lsp-diagnostics/src/index.ts)
+
 <a id="deepseek-aidsh-tool-pwsh"></a>
 
 ## `@deepseek-ai/dsh-tool-pwsh`
@@ -3483,6 +3550,7 @@ export interface Config {
 - `@deepseek-ai/dsh-host-plugin-inventory` — 需要 `loader`（[`packages/host/plugin-inventory/src/index.ts`](../packages/host/plugin-inventory/src/index.ts)）
 - `@deepseek-ai/dsh-llm`（[`packages/llm/llm/src/index.ts`](../packages/llm/llm/src/index.ts)）
 - `@deepseek-ai/dsh-lsp`（[`packages/lsp/lsp/src/index.ts`](../packages/lsp/lsp/src/index.ts)）
+- `@deepseek-ai/dsh-lsp-diagnostics`（[`packages/lsp/lsp-diagnostics/src/index.ts`](../packages/lsp/lsp-diagnostics/src/index.ts)）
 - `@deepseek-ai/dsh-schedule` — 需要 `agents` · `sessions` · `tools` · `sessionPersistence`（[`packages/schedule/schedule/src/index.ts`](../packages/schedule/schedule/src/index.ts)）
 - `@deepseek-ai/dsh-session`（[`packages/core/session/src/index.ts`](../packages/core/session/src/index.ts)）
 - `@deepseek-ai/dsh-session-checkpoint-policy` — 需要 `llm` · `sessionPersistence` · `sessions` · `tools`（[`packages/session/session-checkpoint-policy/src/index.ts`](../packages/session/session-checkpoint-policy/src/index.ts)）

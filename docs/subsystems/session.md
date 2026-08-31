@@ -118,6 +118,27 @@ interface SessionEventMap {
    */
   'request/context': RequestContext
   /**
+   * Latest LSP diagnostics for one workspace, grouped by file.
+   * `workspaceRoot` anchors the snapshot, `byFile` maps each file path to the
+   * diagnostics currently published for that file, and `at` is the snapshot
+   * timestamp in epoch milliseconds.
+   */
+  'lsp/diagnostics': {
+    workspaceRoot: string
+    byFile: Record<
+      string,
+      Array<{
+        uri: string
+        range: { start: { line: number; character: number }; end: { line: number; character: number } }
+        severity?: 1 | 2 | 3 | 4
+        code?: string | number
+        source?: string
+        message: string
+      }>
+    >
+    at: number
+  }
+  /**
    * Marks the end of a constructor seed. Events before it have smaller seq
    * values and came from the seed (resume, fork, or replay); this lifecycle
    * produced none of them. This log-only event is the durable projection of

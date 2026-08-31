@@ -27,8 +27,11 @@ lsp 组为 agent 提供精确的、由语言服务器支撑的代码导航：转
 | [`lsp/`](lsp/README.zh.md) | 定义代码导航服务：按文件扩展名选择提供方、四种规范化的只读操作与结构化错误 | `ctx.lsp` |
 | [`lsp-stdio/`](lsp-stdio/README.zh.md) | 通过 `ctx.fs` 与 `ctx.subprocess` 驱动配置好的 stdio 语言服务器命令，注册为提供方 | 注册到 `ctx.lsp` |
 | [`tool-lsp/`](tool-lsp/README.zh.md) | 通过 `lsp` 工具向模型暴露精确的代码导航 | 注册到 `ctx.tools` |
+| [`lsp-diagnostics/`](lsp-diagnostics/README.zh.md) | 定义诊断服务：面向工作区快照的提供方注册表、带防抖合并/去重的推送观察 | `ctx.lspDiagnostics` |
+| [`lsp-stdio-diagnostics/`](lsp-stdio-diagnostics/README.zh.md) | 以持久的 `didOpen`/`didChange` 同步与 `publishDiagnostics` + `textDocument/diagnostic` + `workspace/diagnostic` 混合驱动配置好的 stdio 诊断服务器 | 注册到 `ctx.lspDiagnostics` |
+| [`tool-lsp-diagnostics/`](tool-lsp-diagnostics/README.zh.md) | 通过 `lsp-diagnostics` 拉取工具向模型暴露诊断 | 注册到 `ctx.tools` |
 
-提供方注册的是能力而非工具：`tool-lsp` 是面向模型的名称、schema、提示词指引与呈现的唯一 owner，因此更换提供方绝不会改变模型请求导航的方式。
+提供方注册的是能力而非工具：`tool-lsp`/`tool-lsp-diagnostics` 是面向模型的名称、schema、提示词指引与呈现的唯一 owner，因此更换提供方绝不会改变模型请求导航的方式。
 
 -----
 

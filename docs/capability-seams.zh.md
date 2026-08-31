@@ -221,6 +221,10 @@ flowchart LR
   pkg_lsp["lsp"]
   svc_lsp["ctx.lsp<br/>Language-server navigation seam"]
   pkg_tool_lsp["tool-lsp"]
+  pkg_lsp_diagnostics["lsp-diagnostics"]
+  svc_lspDiagnostics["ctx.lspDiagnostics<br/>LSP diagnostics push-feed seam"]
+  pkg_lsp_stdio_diagnostics["lsp-stdio-diagnostics"]
+  pkg_tool_lsp_diagnostics["tool-lsp-diagnostics"]
   pkg_cordis_host_runner["cordis-host-runner"]
   svc_dynamicCordisRunner["ctx.dynamicCordisRunner<br/>Dynamic Cordis package host runner"]
   svc_cordisInspect["ctx.cordisInspect<br/>Dynamic Cordis inspect registry"]
@@ -278,7 +282,9 @@ flowchart LR
   pkg_llm_pi_ai --> svc_llm
   pkg_llm_replay --> svc_llm
   pkg_lsp --> svc_lsp
+  pkg_lsp_diagnostics --> svc_lspDiagnostics
   pkg_lsp_stdio --> svc_lsp
+  pkg_lsp_stdio_diagnostics --> svc_lspDiagnostics
   pkg_message_feedback --> svc_messageFeedback
   pkg_permission_presets --> svc_permissionPresets
   pkg_plan_mode --> svc_planMode
@@ -385,6 +391,7 @@ flowchart LR
   svc_llm --> pkg_agent_loop
   svc_llm --> pkg_compaction_basic
   svc_lsp --> pkg_tool_lsp
+  svc_lspDiagnostics --> pkg_tool_lsp_diagnostics
   svc_sandbox --> pkg_bash_sandbox
   svc_sandbox --> pkg_terminal_bash
   svc_sandboxPolicy --> pkg_bash_sandbox
@@ -542,6 +549,7 @@ flowchart LR
 | `ctx.workflowEngine` | `seam` | [`workflow`](../packages/workflow/workflow) | [`workflow-worker-thread`](../packages/workflow/workflow-worker-thread) | [`tool-workflow`](../packages/workflow/tool-workflow), [`tool-ralph`](../packages/workflow/tool-ralph) | - | 每个上下文使用一个引擎，与 bash 相同，且没有具名提供方注册表；通用工作流与固定 Ralph 消费方启动运行，其中的 agent() 调用通过 ctx.subagents 扇出。 |
 | `ctx.webhookRuntime` | `core` | [`webhook`](../packages/webhook/webhook) | - | [`webhook-github`](../packages/webhook/webhook-github) | - | 提供方适配器分派已认证交付；可信插件注册独立的进程本地规则，runtime 把非 null 结果转换为普通的 Workspace-backed Session，不保留交付或完成状态。 |
 | `ctx.lsp` | `seam` | [`lsp`](../packages/lsp/lsp) | [`lsp-stdio`](../packages/lsp/lsp-stdio) | [`tool-lsp`](../packages/lsp/tool-lsp) | - | 提供方注册与选择，加上恰好四种操作的标准化查询执行；该 seam 不提供协议逃生口，后端必须转换为标准化请求和结果。 |
+| `ctx.lspDiagnostics` | `seam` | [`lsp-diagnostics`](../packages/lsp/lsp-diagnostics) | [`lsp-stdio-diagnostics`](../packages/lsp/lsp-stdio-diagnostics) | [`tool-lsp-diagnostics`](../packages/lsp/tool-lsp-diagnostics) | - | 面向工作区范围的诊断，带持久 didOpen/didChange 同步、推送+拉取混合合并、防抖、去重与截断；提供方选择依据是规范化的工作区根，而非文件扩展名。 |
 | `ctx.dynamicCordisRunner` | `core` | [`cordis-host-runner`](../packages/extensions/cordis-host-runner) | - | [`tool-cordis`](../packages/extensions/tool-cordis) | - | 拥有内存定义注册表、Host 半的 vm 沙箱和 request-run 往返流程；浏览器页面通过其 Remote 命名空间在线访问同一服务。 |
 | `ctx.cordisInspect` | `core` | [`cordis-host-runner`](../packages/extensions/cordis-host-runner) | - | [`tool-cordis`](../packages/extensions/tool-cordis) | - | 注册 Host inspect 提供方、镜像 Client 提供方 manifest，并通过动态 Cordis 传输路由 Client 查询。 |
 

@@ -27,8 +27,11 @@ The lsp group gives agents precise, language-server-backed code navigation: go t
 | [`lsp/`](lsp/README.md) | Defines the code-navigation service: provider selection by file extension, four normalized read-only operations, and structured errors | `ctx.lsp` |
 | [`lsp-stdio/`](lsp-stdio/README.md) | Drives configured stdio language-server commands as providers over `ctx.fs` and `ctx.subprocess` | registers on `ctx.lsp` |
 | [`tool-lsp/`](tool-lsp/README.md) | Exposes precise code navigation to the model through the `lsp` tool | registers on `ctx.tools` |
+| [`lsp-diagnostics/`](lsp-diagnostics/README.md) | Defines the diagnostics service: provider registry for workspace-scoped snapshots, push observation with debounced merge/dedupe | `ctx.lspDiagnostics` |
+| [`lsp-stdio-diagnostics/`](lsp-stdio-diagnostics/README.md) | Drives configured stdio diagnostics servers with persistent `didOpen`/`didChange` sync and `publishDiagnostics` + `textDocument/diagnostic` + `workspace/diagnostic` hybrid | registers on `ctx.lspDiagnostics` |
+| [`tool-lsp-diagnostics/`](tool-lsp-diagnostics/README.md) | Exposes diagnostics to the model through the `lsp-diagnostics` pull tool | registers on `ctx.tools` |
 
-Providers register capabilities, not tools: `tool-lsp` is the only owner of the model-facing name, schema, prompt guidance, and presentation, so swapping a provider never changes how the model asks for navigation.
+Providers register capabilities, not tools: `tool-lsp`/`tool-lsp-diagnostics` own the model-facing names, schemas, prompt guidance, and presentation, so swapping a provider never changes how the model asks.
 
 -----
 
