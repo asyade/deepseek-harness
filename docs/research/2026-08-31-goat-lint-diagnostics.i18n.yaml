@@ -1,0 +1,6 @@
+# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
+# side as of the last confirmed-consistent state. Both languages carry equal authority;
+# after editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write docs/research/2026-08-31-goat-lint-diagnostics.md
+2026-08-31-goat-lint-diagnostics.md: 121dd1e484edb5d638aa95f8a4df6bac49857490
+2026-08-31-goat-lint-diagnostics.zh.md: 03c489e5b7b853e4e9629a4acbd90750c5a9e413
