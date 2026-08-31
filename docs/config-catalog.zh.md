@@ -2928,7 +2928,7 @@ export interface Config {
 }
 ```
 
-来源：[`packages/lsp/tool-lsp-diagnostics/src/index.ts:53`](../packages/lsp/tool-lsp-diagnostics/src/index.ts)
+来源：[`packages/lsp/tool-lsp-diagnostics/src/index.ts:52`](../packages/lsp/tool-lsp-diagnostics/src/index.ts)
 
 <a id="deepseek-aidsh-tool-pwsh"></a>
 
