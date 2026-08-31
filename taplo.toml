@@ -1,0 +1,13 @@
+# taplo — TOML formatter/linter gate (research doc §2.3).
+# Run: taplo fmt --check --diff  (or taplo check --output=json)
+# Scans every TOML in the repo; the staged lefthook job covers *.toml.
+include = ["**/*.toml"]
+exclude = ["node_modules/**", "vendor/**", ".pnpm-store/**"]
+
+[formatting]
+# Keep key order as authored; do not auto-reorder.
+reorder_keys = false
+reorder_arrays = false
+# Cargo.toml convention: two-space indent, CRLF-free.
+indent_string = "  "
+reindent = true

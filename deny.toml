@@ -1,0 +1,26 @@
+# cargo-deny — supply-chain + license + ban gate. Conditional CI skips if no Cargo.toml.
+# Shape mirrors docs/research/2026-08-31-goat-lint-diagnostics.md §2.1.1 (Embark spec).
+# Run: cargo deny check advisories bans licenses sources --format sarif
+[advisories]
+db-urls = ["https://github.com/RustSec/advisory-db"]
+yanked = "warn"
+unmaintained = "warn"
+ignore = []
+
+[bans]
+multiple-versions = "warn"
+wildcards = "warn"
+# deny = [{ name = "openssl" }]
+skip = []
+
+[licenses]
+allow = ["MIT", "Apache-2.0", "Apache-2.0 WITH LLVM-exception", "BSD-3-Clause", "ISC", "Unicode-3.0"]
+confidence-threshold = 0.8
+private = { ignore = true }
+# [[licenses.exceptions]] name = "adler2" version = "0.1.1" allow = ["Zlib"]
+
+[sources]
+unknown-registry = "warn"
+unknown-git = "warn"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

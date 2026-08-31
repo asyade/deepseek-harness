@@ -1,0 +1,15 @@
+# yamllint — generic YAML lint gate (research doc §2.3/§2.5).
+# Run: yamllint . --strict --format parsable
+# Staged lefthook job covers *.yaml/*.yml; CI gate is conditional on file presence.
+# Extends the default rules; line-length relaxed to 120, truthy disabled (YAML 1.1
+# truthy coercion is ubiquitous in CI workflows and lefthook configs).
+extends: default
+
+rules:
+  line-length:
+    max: 120
+    level: warning
+  truthy:
+    disable
+  document-start:
+    disable

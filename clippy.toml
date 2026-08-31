@@ -1,0 +1,6 @@
+# Clippy — pinned so editor (rust-analyzer check=clippy / bacon-ls) and CI agree.
+# See docs/subsystems/lsp.md#clippy-via-lsp--deployment-example and
+# docs/research/2026-08-31-goat-lint-diagnostics.md §2.4.
+# Never enable pedantic/nursery/restriction wholesale — whitelist 3–5 lints via
+# [lints.clippy] in Cargo.toml or -W flags in initializationOptions.extraArgs.
+msrv = "1.78"

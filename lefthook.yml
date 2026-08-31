@@ -34,6 +34,16 @@ pre-commit:
     - name: whitespace (staged)
       run: git diff --cached --check
 
+    # Generic-file lint lane (GOAT research §2.3): each job no-ops when the
+    # tool is not installed, so hooks stay portable across machines.
+    - name: toml format (staged)
+      glob: '*.toml'
+      run: command -v taplo >/dev/null 2>&1 && taplo fmt --check --diff {staged_files} || true
+
+    - name: yaml lint (staged)
+      glob: '*.{yaml,yml}'
+      run: command -v yamllint >/dev/null 2>&1 && yamllint {staged_files} || true
+
     - name: vendor manifest guard
       run: scripts/check-vendor-manifest.sh
 
