@@ -11,7 +11,7 @@ import { z } from 'zod'
 
 const server = new McpServer(
   { name: 'fixture-server', version: '1.0.0' },
-  { capabilities: { tools: { listChanged: true } } },
+  { capabilities: { tools: { listChanged: true }, resources: {} } },
 )
 
 server.registerTool('add', {
@@ -70,6 +70,22 @@ server.registerTool('admin.reset', {
   inputSchema: {},
 }, async () => ({
   content: [{ type: 'text', text: 'reset done' }],
+}))
+
+server.registerResource('notes', 'fixture://notes.txt', {
+  title: 'Notes',
+  description: 'A short text resource.',
+  mimeType: 'text/plain',
+}, uri => ({
+  contents: [{ uri: uri.href, mimeType: 'text/plain', text: 'remember the milk' }],
+}))
+
+// Binary contents must reach the model as a diagnostic, never as base64.
+server.registerResource('logo', 'fixture://logo.png', {
+  title: 'Logo',
+  mimeType: 'image/png',
+}, uri => ({
+  contents: [{ uri: uri.href, mimeType: 'image/png', blob: 'aGVsbG8=' }],
 }))
 
 const transport = new StdioServerTransport()

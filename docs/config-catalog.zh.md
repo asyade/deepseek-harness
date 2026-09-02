@@ -1574,6 +1574,8 @@ export interface StdioConfig {
   toolCallTimeoutMs: number
   /** Fail plugin activation when the initial connection or tool synchronization fails. */
   failOnStartupError: boolean
+  /** Resources bridge settings; omission uses the defaults. */
+  resources?: ResourcesConfig
   /** Automatic reconnect policy after a lost connection; omission uses the defaults. */
   reconnect?: ReconnectConfig
 }
@@ -1596,8 +1598,24 @@ export interface StreamableHttpConfig {
   toolCallTimeoutMs: number
   /** Fail plugin activation when the initial connection or tool synchronization fails. */
   failOnStartupError: boolean
+  /** Resources bridge settings; omission uses the defaults. */
+  resources?: ResourcesConfig
   /** Automatic reconnect policy after a lost connection; omission uses the defaults. */
   reconnect?: ReconnectConfig
+}
+
+/**
+ * Resources bridge settings for one server. The helpers are also
+ * capability-gated: a server that does not advertise `resources` gets none
+ * regardless of `enabled`.
+ */
+export interface ResourcesConfig {
+  /** Register the `list_resources` and `read_resource` helpers for this server. */
+  enabled: boolean
+  /** Maximum resource and template entries rendered by one `list_resources` call. */
+  maxListEntries: number
+  /** Maximum characters of resource text rendered by one `read_resource` call. */
+  maxContentChars: number
 }
 
 /** Automatic reconnect policy for one MCP server connection. */
@@ -1613,7 +1631,7 @@ export interface ReconnectConfig {
 }
 ```
 
-来源：[`packages/mcp/mcp-client/src/index.ts:98`](../packages/mcp/mcp-client/src/index.ts)
+来源：[`packages/mcp/mcp-client/src/index.ts:105`](../packages/mcp/mcp-client/src/index.ts)
 
 <a id="deepseek-aidsh-message-feedback"></a>
 

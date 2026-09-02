@@ -120,6 +120,33 @@ describe('fixture server — controlled scenarios', () => {
     await rm(home, { recursive: true, force: true })
   })
 
+  it('bridges the server resources as list and read helpers', async () => {
+    const listed = await ctx.tools.execute({
+      signal: testToolSignal, callId: nextCallId(), name: 'mcp__fixture__list_resources', arguments: {},
+    })
+    const listedText = (listed.content[0] as { text: string }).text
+    expect(listedText).toContain('- fixture://notes.txt — Notes — A short text resource. (text/plain)')
+    expect(listedText).toContain('- fixture://logo.png')
+
+    const read = await ctx.tools.execute({
+      signal: testToolSignal,
+      callId: nextCallId(),
+      name: 'mcp__fixture__read_resource',
+      arguments: { uri: 'fixture://notes.txt' },
+    })
+    expect((read.content[0] as { text: string }).text).toBe('[fixture://notes.txt (text/plain)]\nremember the milk')
+
+    const binary = await ctx.tools.execute({
+      signal: testToolSignal,
+      callId: nextCallId(),
+      name: 'mcp__fixture__read_resource',
+      arguments: { uri: 'fixture://logo.png' },
+    })
+    const binaryText = (binary.content[0] as { text: string }).text
+    expect(binaryText).toContain('[binary resource omitted: fixture://logo.png (image/png)')
+    expect(binaryText).not.toContain('aGVsbG8=')
+  })
+
   it('discovers all fixture tools under the server namespace', () => {
     const schemas = ctx.tools.schemas()
     const names = schemas.map(s => s.name)

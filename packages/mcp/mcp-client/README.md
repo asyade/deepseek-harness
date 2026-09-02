@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 
 ## Summary
 
-`dsh-mcp-client` attaches external Model Context Protocol (MCP) servers to the harness so their tools work like any native tool. With one configuration entry per server, the model can call that server's tools — a filesystem, GitHub, database, or memory server — under stable names such as `mcp__github__create_issue`. Add it when the model should work with an external tool server; nothing ships enabled, so you opt in. The main cost is the tokens those tool definitions add to every request, and a slow or crashed server can delay startup or leave its tools failing until it recovers. Only tools are bridged: MCP resources and prompts are not supported.
+`dsh-mcp-client` attaches external Model Context Protocol (MCP) servers to the harness so their tools work like any native tool. With one configuration entry per server, the model can call that server's tools — a filesystem, GitHub, database, or memory server — under stable names such as `mcp__github__create_issue`. Add it when the model should work with an external tool server; nothing ships enabled, so you opt in. The main cost is the tokens those tool definitions add to every request, and a slow or crashed server can delay startup or leave its tools failing until it recovers. Servers that expose resources also get two reading helpers; MCP prompts are not supported.
 
 ## Table of Contents
 
@@ -60,6 +60,9 @@ Add one entry per server; nothing else is required. After the harness starts, th
 | `url` / `headers` | — | streamable-http: endpoint URL and extra request headers |
 | `toolCallTimeoutMs` | `60,000` | Timeout per `tools/call` invocation |
 | `failOnStartupError` | `false` | Reject plugin activation when the initial connection or tool synchronization fails |
+| `resources.enabled` | `true` | Offer the resource-reading helpers when the server advertises resources |
+| `resources.maxListEntries` | `500` | Entries one `list_resources` call renders before truncating |
+| `resources.maxContentChars` | `32,000` | Characters one `read_resource` call renders before truncating |
 | `reconnect.enabled` | `true` | Reconnect automatically after a lost connection |
 | `reconnect.initialDelayMs` | `500` | First reconnect delay; doubles per consecutive failed attempt |
 | `reconnect.maxDelayMs` | `30,000` | Backoff ceiling; also the uptime after which the attempt budget resets |
@@ -84,6 +87,14 @@ When the model calls an MCP tool, the call runs against the remote server with a
 
 Images are supported when the current model accepts image input and the harness attachment feature is enabled; they then appear in the conversation like other images. Otherwise — and for audio or embedded resources — the model sees a clear diagnostic message instead of nothing.
 
+### Reading the server's resources
+
+Some MCP servers publish resources — files, database schemas, logs, application state — as readable data rather than callable tools. When a server advertises them, two extra tools appear alongside its own: `mcp__<serverName>__list_resources` returns the metadata (URI, name, description, MIME type, plus the URI templates for parameterized resources), and `mcp__<serverName>__read_resource` returns one resource's text by URI. The model discovers and pulls; nothing is injected into the prompt on its own.
+
+Long lists page: `list_resources` returns a cursor to pass back when it stops at 500 entries. Long contents truncate at 32,000 characters with a notice. Binary resources are reported as a one-line description with their type and size — never as base64. A server error, such as reading a URI that does not exist, fails the call visibly.
+
+Servers that do not advertise resources get no extra tools, and neither do servers configured with `resources.enabled: false`. When a server publishes its own tool named `list_resources` or `read_resource`, that tool wins the name and the helper is skipped.
+
 ### Startup, updates, and reconnection
 
 The server's tools appear before the harness starts its first turn. When the server changes its tool list, the model's tool set updates automatically; if the update fails, the previous tool set keeps working.
@@ -106,6 +117,7 @@ This section explains the design decisions behind the bridge and points at the c
 - **Naming is a pinned contract.** Public names are pure functions of `(serverName, rawName)` and satisfy the DeepSeek function-name contract; lossy normalization appends a 12-hex-char SHA-256 hash so distinct identities never collapse. Session history and permission rules therefore survive HMR swaps, re-syncs, and other servers' changes.
 - **The raw name is the only wire name.** `tools/call` always receives the raw name; the public name is never sent to the server and never parsed to recover the raw name.
 - **Full generation or none.** Syncs swap generations atomically: a fetch failure keeps the previous generation, and a registration conflict rolls back the entire attempted generation.
+- **Resources are model-pulled, not injected.** MCP calls resources application-controlled and leaves the host to decide how they reach the model. The harness has no attachment picker, so the decision is a bounded tool pair the model calls when it judges a resource relevant; no cache and no subscription means every call reads live state.
 - **One canonical value, one projection.** The executor returns the protocol-complete canonical `McpResult`; a separate ordered projection prepares Native content, and `finalizeContent` installs it only when the registry's post-execute result is unchanged, so policy blocks and value replacements stay authoritative.
 
 ### Source map
@@ -115,6 +127,7 @@ This section explains the design decisions behind the bridge and points at the c
 | [`src/index.ts`](src/index.ts) | Plugin entry: `Config` schema, `serverName` reservation, activation await |
 | [`src/connection.ts`](src/connection.ts) | Connection supervisor: client generations, reconnect policy, attempt budget, disposal |
 | [`src/tools.ts`](src/tools.ts) | Tool bridge: discovery, naming, registration swap, execution, image projection |
+| [`src/resources.ts`](src/resources.ts) | Resources bridge: bounds resolution, capability gate, the two reading helpers |
 | [`src/transport.ts`](src/transport.ts) | Transport factory: stdio spawn with scrubbed env, Streamable HTTP |
 | — | No runtime invariant companion is published; MCP generations contribute through the tool registry, but the bridge exposes no independent server-to-tool snapshot after an asynchronous resync. |
 
@@ -143,6 +156,7 @@ Read these pages when the package-level contract is not enough. They move from t
 
 - [Tools subsystem reference](../../../docs/subsystems/tools.md) — the `ToolRuntime` and `ctx.tools.register()` contract that receives the bridged tools.
 - [MCP client plugin Agent Note](../../../.agents/notes/implemented/feature/2026-07-07-mcp-client-plugin.md) — the naming invariants, discovery and execution design, alternatives, and consequences.
+- [MCP resources bridge Agent Note](../../../.agents/notes/implemented/feature/2026-09-02-mcp-client-resources-bridge.md) — why resources are model-pulled helpers inside this package rather than a sibling plugin.
 - [Canonical tool output contract Agent Note](../../../.agents/notes/implemented/architecture/2026-07-20-canonical-tool-output-contract.md) — how MCP results map into the canonical tool-output contract.
 - [Third-party memory MCP guide](../../../docs/user/guide/mcp-memory.md) — three memory-server overlays using this package.
 - [Generated configuration catalog](../../../docs/config-catalog.md#deepseek-aidsh-mcp-client) — every accepted config field and its source declaration.
@@ -166,6 +180,20 @@ The tool descriptions and input schemas enter every request while the tools are 
 
 The tool-definition prefix stays stable while the discovered set and schemas are unchanged. A re-sync that adds, removes, renames, or changes a tool replaces definitions and may invalidate reuse from the first changed schema token onward; a reconnect that recovers an unchanged list reproduces identical definitions and stays prefix-stable.
 
+### Resource-reading helpers
+
+#### What the model sees
+
+A server advertising the `resources` capability contributes `mcp__<serverName>__list_resources` and `mcp__<serverName>__read_resource` to the same generation as its own tools, and they are removed with it. Listings are metadata lines only; reads are text under a per-entry `[uri (mimeType)]` header. Truncation, binary contents, and unusable descriptors each appear as a bracketed diagnostic line rather than silently missing data.
+
+#### Token effect
+
+Two extra tool definitions enter every request while the server is registered. Resource contents enter context only when the model calls `read_resource`, bounded by `maxContentChars`; listings are bounded by `maxListEntries`. Binary payloads never enter context.
+
+#### KV Cache effect
+
+The two definitions are static text and stay prefix-stable across re-syncs and reconnects. Results append after the reusable prefix like any other tool result.
+
 ### Tool-call history and results
 
 #### What the model sees
@@ -187,7 +215,9 @@ Append-only; newly visible content follows the reusable request prefix and does 
 
 These limits describe what you cannot do with this plugin and when it needs operational attention. They are current package constraints, not a comparison with other MCP clients or a task backlog.
 
-- **Tools are the only bridged MCP capability** — Resources and Prompts have no harness consumer mechanism and are deferred.
+- **Prompts are not bridged** — MCP Prompts have no harness consumer mechanism and are deferred.
+- **Resources are read, never watched** — `resources/subscribe` and the `list_changed` and `updated` notifications are unused; each helper call reads live state instead, so a resource that changes mid-turn is only seen on the next call.
+- **Resource text only** — `read_resource` renders text contents; binary contents become a size-and-type diagnostic rather than an attachment, and URI templates are listed for the model to expand rather than completed through the MCP completion API.
 - **Startup and discovery timeouts are inherited from the MCP SDK** — the plugin exposes no connection or discovery timeout; each `initialize` and paginated `tools/list` request uses the SDK's 60-second request default, so an unresponsive server or cursor chain can delay both activation and teardown while the initial synchronization settles.
 - **Reconnect triggers on transport close** — a crashed stdio child fires it; Streamable HTTP failures surface per request through the SDK transport's own recovery, so an unreachable HTTP server is retried per call rather than respawned by the supervisor.
 - **Image is the only durable rich-result bridge** — PNG, JPEG, WebP, and GIF enter Native context after exact capability proof. Audio and embedded-resource payloads remain execution-local with explicit diagnostics, while resource links preserve only their name and URI as text.
@@ -205,7 +235,7 @@ This Dev Note is working context for maintainers: open design questions and dire
 - The public-name algorithm is a v1 contract pinned by tests; changing it after release would break session history and permission rules.
 - An explicit DSH-owned connection and discovery timeout is an open direction; the SDK's 60-second default bounds startup and teardown.
 - Reconnect ownership for Streamable HTTP is open: per-request retry is SDK behavior, and the supervisor could also own the HTTP generation.
-- Bridging MCP Resources needs a harness-side injection decision (system prompt, on demand, or model-triggered); bridging Prompts needs a prompt-template concept the harness lacks.
+- Routing binary resource contents into the attachment store, the way image tool results already are, is an open direction; bridging Prompts needs a prompt-template concept the harness lacks.
 - The pinned MCP SDK is still evolving; a breaking upstream change requires updating the bridge.
 
 </details>

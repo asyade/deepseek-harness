@@ -25,6 +25,7 @@ import type { ToolDefinition, ToolExecution, ToolExecutionResult } from '@deepse
 import { assertSupportedJsonSchema } from '@deepseek-ai/dsh-tools'
 import type { JsonSchemaNode } from '@deepseek-ai/dsh-tools'
 import type { JsonValue } from '@deepseek-ai/dsh-util-values'
+import { buildResourceDefinitions } from './resources.ts'
 
 /** Resolved options relevant to tool bridging. */
 export interface ToolBridgeOptions {
@@ -32,6 +33,16 @@ export interface ToolBridgeOptions {
   registrationFailure: 'contain' | 'throw'
   serverName: string
   toolCallTimeoutMs: number
+  /** Bounds for the resources bridge; absent disables it for this server. */
+  resources?: ResourceBounds | undefined
+}
+
+/** Output caps the resources bridge applies to untrusted server responses. */
+export interface ResourceBounds {
+  /** Maximum resource/template entries rendered by one `list_resources` call. */
+  maxListEntries: number
+  /** Maximum characters of resource text rendered by one `read_resource` call. */
+  maxContentChars: number
 }
 
 /** State for one sync generation: the current set of disposers keyed by public name. */
@@ -173,6 +184,17 @@ export async function syncTools(
     }
     cursor = response.nextCursor
   } while (cursor)
+
+  // The resources helpers join this generation so the swap stays atomic. The
+  // server's own tool wins a name collision: the helper is skipped, never
+  // fatal, because a server that names a tool `list_resources` is legitimate.
+  for (const entry of buildResourceDefinitions(client, opts)) {
+    if (definitions.has(entry.publicName)) {
+      ctx.logger.warn(`mcp-client(${opts.serverName}): server tool "${entry.rawName}" collides with the resources bridge helper of the same name — helper skipped`)
+      continue
+    }
+    definitions.set(entry.publicName, entry.definition)
+  }
 
   // Phase 2: swap generations.
   for (const dispose of previous.values()) dispose()

@@ -23,6 +23,8 @@ const { mockConnect, mockClose, mockListTools, mockCallTool, mockSetNotification
     _params?: Record<string, unknown>, _compatibilitySchema?: unknown, _options?: unknown,
   ) => Promise<unknown>>()
   const mockSetNotificationHandler = vi.fn()
+  // Tools-only capabilities keep these lifecycle specs off the resources bridge.
+  const mockGetServerCapabilities = vi.fn(() => ({ tools: {} }))
   const mockRequest = vi.fn(async (
     request: { method: string; params?: Record<string, unknown> },
     _schema: unknown,
@@ -38,6 +40,7 @@ const { mockConnect, mockClose, mockListTools, mockCallTool, mockSetNotification
     close = mockClose
     request = mockRequest
     setNotificationHandler = mockSetNotificationHandler
+    getServerCapabilities = mockGetServerCapabilities
     constructor() { instances.push(this) }
   }
   const instances: MockClient[] = []

@@ -9,7 +9,7 @@ kind: "package-reference"
 
 ## 概述
 
-`dsh-mcp-client` 把外部 MCP（Model Context Protocol）服务器挂载到 harness 上，让它们的工具像原生工具一样可用。每台服务器一条配置项，模型就能调用该服务器的工具——文件系统、GitHub、数据库或记忆服务器——名称稳定，例如 `mcp__github__create_issue`。当模型需要使用外部工具服务器时添加它；默认不启用任何服务器，因此由你开启。主要成本是这些工具定义给每次请求增加的 token，而且缓慢或崩溃的服务器可能延迟启动，或在恢复前让它的工具一直调用失败。只桥接工具能力：MCP resources 与 prompts 不受支持。
+`dsh-mcp-client` 把外部 MCP（Model Context Protocol）服务器挂载到 harness 上，让它们的工具像原生工具一样可用。每台服务器一条配置项，模型就能调用该服务器的工具——文件系统、GitHub、数据库或记忆服务器——名称稳定，例如 `mcp__github__create_issue`。当模型需要使用外部工具服务器时添加它；默认不启用任何服务器，因此由你开启。主要成本是这些工具定义给每次请求增加的 token，而且缓慢或崩溃的服务器可能延迟启动，或在恢复前让它的工具一直调用失败。暴露 resources 的服务器还会获得两个读取助手工具；MCP prompts 不受支持。
 
 ## 目录
 
@@ -60,6 +60,9 @@ kind: "package-reference"
 | `url` / `headers` | — | streamable-http：端点 URL 与额外请求标头 |
 | `toolCallTimeoutMs` | `60,000` | 每次 `tools/call` 调用的超时 |
 | `failOnStartupError` | `false` | 初始连接或工具同步失败时拒绝插件激活 |
+| `resources.enabled` | `true` | 服务器声明 resources 能力时提供资源读取助手工具 |
+| `resources.maxListEntries` | `500` | 单次 `list_resources` 调用截断前渲染的条目数 |
+| `resources.maxContentChars` | `32,000` | 单次 `read_resource` 调用截断前渲染的字符数 |
 | `reconnect.enabled` | `true` | 连接丢失后自动重新连接 |
 | `reconnect.initialDelayMs` | `500` | 首次重连延迟；每次连续失败尝试翻倍 |
 | `reconnect.maxDelayMs` | `30,000` | 退避上限；同时是重置尝试预算所需的正常运行时长 |
@@ -84,6 +87,14 @@ kind: "package-reference"
 
 当前模型接受图片输入且 harness 启用了附件功能时支持图片；图片会像其他图片一样出现在对话中。不支持图片时——以及服务器返回音频或嵌入资源时——模型会看到清晰的诊断消息，而不是什么都没有。
 
+### 读取服务器的 resources
+
+有些 MCP 服务器把文件、数据库 schema、日志、应用状态等作为 resources 发布，它们是可读数据而非可调用工具。当服务器声明该能力时，除它自己的工具外还会出现两个工具：`mcp__<serverName>__list_resources` 返回元数据（URI、名称、描述、MIME 类型，以及参数化资源的 URI 模板），`mcp__<serverName>__read_resource` 按 URI 返回单个资源的文本。由模型发现并拉取；不会自行注入提示词。
+
+长列表分页：`list_resources` 在 500 条处停止，并返回可回传的游标。长内容在 32,000 字符处截断并给出提示。二进制资源以一行描述报告其类型与大小——绝不返回 base64。服务器错误（例如读取不存在的 URI）会让调用明确失败。
+
+未声明 resources 能力的服务器不会获得额外工具，配置了 `resources.enabled: false` 的服务器同样如此。当服务器自己发布了名为 `list_resources` 或 `read_resource` 的工具时，该工具占用这个名称，助手工具被跳过。
+
 ### 启动、工具更新与重连
 
 服务器的工具会在 harness 开始首个轮次之前出现。服务器更改工具列表时，模型的工具集会自动更新；更新失败时，上一组工具继续可用。
@@ -106,6 +117,7 @@ kind: "package-reference"
 - **命名是固定约定。** 公开名称是 `(serverName, rawName)` 的纯函数，并满足 DeepSeek 函数名称约定；有损规范化会追加 12 位十六进制 SHA-256 hash，使不同身份绝不会折叠。会话历史与权限规则因此能在 HMR 替换、重新同步和其他服务器变化后保持有效。
 - **原始名称是唯一的协议名称。** `tools/call` 始终收到原始名称；公开名称绝不会发给服务器，也绝不会被解析来还原原始名称。
 - **要么完整世代，要么没有。** 同步会原子地交换世代：获取失败保留上一世代，注册冲突则回滚整个尝试中的世代。
+- **Resources 由模型拉取，而非注入。** MCP 将 resources 定义为由应用控制，由宿主决定它们如何抵达模型。harness 没有附件选择界面，因此这个决策落为一对有界工具，由模型在判断某个资源相关时调用；不做缓存、不做订阅，因此每次调用读取的都是实时状态。
 - **一个规范值，一个投影。** 执行器返回协议完整的规范 `McpResult`；另一个有序投影准备 Native 内容，`finalizeContent` 只在注册表的执行后结果未变时安装它，因此策略块与值替换保持权威。
 
 ### 源码地图
@@ -115,6 +127,7 @@ kind: "package-reference"
 | [`src/index.ts`](src/index.ts) | 插件入口：`Config` schema、`serverName` 预留、激活等待 |
 | [`src/connection.ts`](src/connection.ts) | 连接监督器：客户端世代、重连策略、尝试预算、dispose |
 | [`src/tools.ts`](src/tools.ts) | 工具桥接：发现、命名、注册交换、执行、图片投影 |
+| [`src/resources.ts`](src/resources.ts) | resources 桥接：边界解析、能力门控、两个读取助手工具 |
 | [`src/transport.ts`](src/transport.ts) | 传输工厂：带清洗环境的 stdio spawn、Streamable HTTP |
 | — | 不发布运行时不变式伴生入口；世代只能通过工具注册表观察。 |
 
@@ -143,6 +156,7 @@ kind: "package-reference"
 
 - [工具子系统参考](../../../docs/subsystems/tools.zh.md)——接收已桥接工具的 `ToolRuntime` 与 `ctx.tools.register()` 约定。
 - [MCP 客户端插件 Agent Note](../../../.agents/notes/implemented/feature/2026-07-07-mcp-client-plugin.zh.md)——命名不变式、发现与执行设计、备选方案与后果。
+- [MCP resources 桥接 Agent Note](../../../.agents/notes/implemented/feature/2026-09-02-mcp-client-resources-bridge.zh.md)——为什么 resources 是本包内由模型拉取的助手工具，而不是一个兄弟插件。
 - [规范工具输出约定 Agent Note](../../../.agents/notes/implemented/architecture/2026-07-20-canonical-tool-output-contract.zh.md)——MCP 结果如何映射进规范工具输出约定。
 - [第三方记忆 MCP 指南](../../../docs/user/guide/mcp-memory.zh.md)——使用本包的三份记忆服务器 overlay。
 - [生成配置目录](../../../docs/config-catalog.zh.md#deepseek-aidsh-mcp-client)——每个受支持配置字段及其源声明。
@@ -166,6 +180,20 @@ kind: "package-reference"
 
 已发现工具集合及其 schema 不变时，工具定义前缀保持稳定。增加、移除、重命名或更改工具的重新同步会替换定义，并可能使从第一个变化的 schema token 起的复用失效；恢复未变列表的重连会生成完全相同的定义，前缀保持稳定。
 
+### 资源读取助手工具
+
+#### 模型看到什么
+
+声明 `resources` 能力的服务器会向与其自身工具相同的世代贡献 `mcp__<serverName>__list_resources` 与 `mcp__<serverName>__read_resource`，并随该世代一起移除。列表只含元数据行；读取结果是位于每条 `[uri (mimeType)]` 头部之下的文本。截断、二进制内容与不可用的描述符各自表现为一行方括号诊断，而不是静默缺失的数据。
+
+#### Token 影响
+
+服务器注册期间，两个额外的工具定义会进入每次请求。资源内容只在模型调用 `read_resource` 时进入上下文，受 `maxContentChars` 约束；列表受 `maxListEntries` 约束。二进制载荷绝不进入上下文。
+
+#### KV Cache 影响
+
+这两个定义是静态文本，在重新同步与重连之间保持前缀稳定。结果像其他工具结果一样追加在可复用前缀之后。
+
 ### 工具调用历史与结果
 
 #### 模型看到什么
@@ -187,7 +215,9 @@ kind: "package-reference"
 
 这些限制说明你无法用本插件做什么、以及何时需要运维注意。它们是当前包约束，不是与其他 MCP 客户端的对比，也不是任务积压。
 
-- **只桥接 MCP 的工具能力**——Resources 与 Prompts 没有 harness 消费机制，暂缓实现。
+- **不桥接 Prompts**——MCP Prompts 没有 harness 消费机制，暂缓实现。
+- **Resources 只读取，不监听**——不使用 `resources/subscribe` 以及 `list_changed` 与 `updated` 通知；每次助手工具调用改为读取实时状态，因此回合中途变化的资源只在下次调用时被看到。
+- **只处理资源文本**——`read_resource` 渲染文本内容；二进制内容变为大小与类型诊断而非附件，URI 模板只被列出供模型展开，而不经 MCP completion API 补全。
 - **启动与发现超时继承自 MCP SDK**——插件不暴露连接或发现超时；每次 `initialize` 与分页 `tools/list` 请求都使用 SDK 默认的 60 秒请求超时，因此无响应的服务器或 cursor chain 在初始同步完成期间可能同时延迟激活与 teardown。
 - **重连在传输关闭时触发**——崩溃的 stdio 子进程会触发重连；Streamable HTTP 失败按请求经 SDK 传输自身的恢复机制暴露，因此不可达的 HTTP 服务器会按调用重试，而非由 supervisor 重新 spawn。
 - **图片是唯一的持久丰富结果桥接**——PNG、JPEG、WebP 与 GIF 在确切能力得到证明后进入 Native 上下文。音频与嵌入资源载荷仍只存在于执行局部并带明确诊断，资源链接只以文本保留名称与 URI。
@@ -205,7 +235,7 @@ kind: "package-reference"
 - 公开名称算法是由测试固定的 v1 约定；发布后更改会破坏会话历史与权限规则。
 - 由 DSH 显式拥有的连接与发现超时是开放的探索方向；SDK 的 60 秒默认值约束着启动与 teardown。
 - Streamable HTTP 的重连归属仍未决定：按请求重试是 SDK 行为，supervisor 也可以拥有 HTTP 世代。
-- 桥接 MCP Resources 需要 harness 侧的注入决策（系统提示词、按需或模型触发）；桥接 Prompts 需要 harness 缺少的提示词模板概念。
+- 把二进制资源内容路由进附件存储（如同图片工具结果已经做的那样）是开放的探索方向；桥接 Prompts 需要 harness 缺少的提示词模板概念。
 - 固定的 MCP SDK 仍在演化；上游破坏性变更需要更新桥接。
 
 </details>
