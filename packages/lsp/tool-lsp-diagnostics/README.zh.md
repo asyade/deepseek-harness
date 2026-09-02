@@ -76,7 +76,7 @@ agent 在写入文件后使用 `lsp-diagnostics` 拉取防抖后的诊断快照�
 | [`src/index.ts`](src/index.ts) | 插件入口：配置 schema、工具注册、系统提示词小节、执行与严重级别/截断逻辑 |
 | [`src/render.ts`](src/render.ts) | 纯格式化：`prettyDiagnostic`/`report`/`formatDiagnostics`、截断、UI 呈现 |
 | [`src/session-cwd.ts`](src/session-cwd.ts) | 来自会话 `header.cwd` 的工作区根 |
-| [`src/invariant.ts`](src/invariant.ts) | 不变量伴生（无运行时不变量；无状态适配器） |
+| — | 不发布运行时不变式伴生入口；这个无状态适配器只贡献一个工具与提示词段落，快照生命周期由它组合的 diagnostics seam 拥有。 |
 
 </details>
 

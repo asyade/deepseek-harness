@@ -85,7 +85,7 @@ This section explains the design decisions behind the seam and where the code re
 | [`src/index.ts`](src/index.ts) | Plugin entry: `LspDiagnostics` service, `registerProvider`/`diagnostics`/`onDiagnostics`, `canonicalizeWorkspaceRoot`, `LspError` |
 | [`src/types.ts`](src/types.ts) | Seam vocabulary: `LspDiagnostic`, `LspDiagnosticsSnapshot`, `LspDiagnosticsRequest`, provider and service contracts |
 | [`src/brand.ts`](src/brand.ts) | `LspDiagnosticsProviderId` branded-id type and factory |
-| [`src/invariant.ts`](src/invariant.ts) | Invariant companion (no runtime invariant; provider and push subscriptions are private atomic state) |
+| — | No runtime invariant companion is published; provider ids and push subscriptions are private, atomically updated state with no independently observable snapshot. |
 
 ### Registration and lifecycle
 

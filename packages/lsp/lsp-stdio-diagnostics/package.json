@@ -1,7 +1,7 @@
 {
   "name": "@deepseek-ai/dsh-lsp-stdio-diagnostics",
-  "description": "Stdio diagnostics provider for the DeepSeek Harness LSP diagnostics seam (ctx.lspDiagnostics) — persistent document sync, push (publishDiagnostics) + pull (textDocument/diagnostic + workspace/diagnostic) hybrid, debounced merge/dedupe/caps",
-  "version": "0.1.2-alpha.1",
+  "description": "Stdio diagnostics provider for the DeepSeek Harness LSP diagnostics seam (ctx.lspDiagnostics) \u2014 persistent document sync, push (publishDiagnostics) + pull (textDocument/diagnostic + workspace/diagnostic) hybrid, debounced merge/dedupe/caps",
+  "version": "0.1.2-alpha.4",
   "publishConfig": {
     "access": "public"
   },
@@ -18,23 +18,17 @@
       "types": "./lib/types/index.d.ts",
       "default": "./lib/index.js"
     },
-    "./invariant": {
-      "types": "./lib/types/invariant.d.ts",
-      "default": "./lib/invariant.js"
-    },
     "./src/*": "./src/*",
     "./package.json": "./package.json"
   },
   "files": [
     "lib/index.js",
-    "lib/invariant.js",
     "lib/types/**/*.d.ts"
   ],
   "license": "MIT",
   "peerDependencies": {
     "@deepseek-ai/dsh-brand": "workspace:^",
     "@deepseek-ai/dsh-fs": "workspace:^",
-    "@deepseek-ai/dsh-invariants": "workspace:^",
     "@deepseek-ai/dsh-llm": "workspace:^",
     "@deepseek-ai/dsh-lsp": "workspace:^",
     "@deepseek-ai/dsh-subprocess": "workspace:^",
@@ -47,7 +41,6 @@
   "devDependencies": {
     "@deepseek-ai/dsh-brand": "workspace:^",
     "@deepseek-ai/dsh-fs": "workspace:^",
-    "@deepseek-ai/dsh-invariants": "workspace:^",
     "@deepseek-ai/dsh-lsp": "workspace:^",
     "@deepseek-ai/dsh-subprocess": "workspace:^",
     "@deepseek-ai/dsh-timeout": "workspace:^",

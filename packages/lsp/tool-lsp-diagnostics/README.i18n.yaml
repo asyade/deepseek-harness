@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/lsp/tool-lsp-diagnostics/README.md
-README.md: aa092ec29c929aa77088ad86dbafdabe9802666b
-README.zh.md: 57da4e8d3650d312f0ad5cb1e73e9f01cbf12c3f
+README.md: 8ef6f9f6f221644f22cb56f741dcc64e31c3e228
+README.zh.md: 952a66cb3db4f25ddd3df623057fe9451386983d

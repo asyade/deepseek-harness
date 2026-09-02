@@ -146,7 +146,7 @@ This section explains the design decisions behind the provider and where the cod
 | [`src/protocol.ts`](src/protocol.ts) | Wire-type subset: diagnostics, capabilities, raft for publish/pull |
 | [`src/translate.ts`](src/translate.ts) | Position-encoding negotiation, diagnostic normalization, `dedupeDiagnostics`/`capSnapshotFiles` |
 | [`src/abort.ts`](src/abort.ts) | Cancellation helpers fusing caller and disposal signals |
-| [`src/invariant.ts`](src/invariant.ts) | Invariant companion (no runtime invariant; pools and queues are private state) |
+| — | No runtime invariant companion is published; the pools and queues are private state, and the only observable contract is the debounced snapshot and its `lsp/diagnostics` projection. |
 
 ### Protocol behavior
 

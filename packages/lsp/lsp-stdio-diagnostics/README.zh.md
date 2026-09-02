@@ -146,7 +146,7 @@ CI 门禁（条件式）：`cargo clippy --all-targets --all-features -- -D warn
 | [`src/protocol.ts`](src/protocol.ts) | 线上类型子集：诊断、能力、publish/pull 的 raft |
 | [`src/translate.ts`](src/translate.ts) | 位置编码协商、诊断规范化、`dedupeDiagnostics`/`capSnapshotFiles` |
 | [`src/abort.ts`](src/abort.ts) | 融合调用方与释放信号的取消助手 |
-| [`src/invariant.ts`](src/invariant.ts) | 不变量伴生（无运行时不变量；池与队列为私有状态） |
+| — | 不发布运行时不变式伴生入口；池与队列是私有状态，唯一可观察的约定是防抖快照及其 `lsp/diagnostics` 投影。 |
 
 ### 协议行为
 

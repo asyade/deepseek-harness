@@ -85,7 +85,7 @@ seam 需要提供方与消费方才有所作为。最小组合挂载服务、std
 | [`src/index.ts`](src/index.ts) | 插件入口：`LspDiagnostics` 服务、`registerProvider`/`diagnostics`/`onDiagnostics`、`canonicalizeWorkspaceRoot`、`LspError` |
 | [`src/types.ts`](src/types.ts) | seam 词汇：`LspDiagnostic`、`LspDiagnosticsSnapshot`、`LspDiagnosticsRequest`、提供方与服务契约 |
 | [`src/brand.ts`](src/brand.ts) | `LspDiagnosticsProviderId` 品牌化 id 类型与工厂 |
-| [`src/invariant.ts`](src/invariant.ts) | 不变量伴生（无运行时不变量；提供方与推送订阅为私有原子状态） |
+| — | 不发布运行时不变式伴生入口；提供方 id 与推送订阅是私有的原子更新状态，没有可独立观察的快照。 |
 
 ### 注册与生命周期
 
