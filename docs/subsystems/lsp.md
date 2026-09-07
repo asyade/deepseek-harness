@@ -166,7 +166,7 @@ interface LspService {
 
 ## Diagnostics
 
-The diagnostics seam — a [capability seam](../../.agents/notes/implemented/architecture/2026-07-15-lsp-capability-seam.md) exposing workspace-scoped diagnostics on one `ctx.lspDiagnostics` service, split across packages: Service Definition ([dsh-lsp-diagnostics](../../packages/lsp/lsp-diagnostics), `ctx.lspDiagnostics` + the provider registry), a generic Service Provider ([dsh-lsp-stdio-diagnostics](../../packages/lsp/lsp-stdio-diagnostics), a configured stdio diagnostics host), and Consumer ([dsh-tool-lsp-diagnostics](../../packages/lsp/tool-lsp-diagnostics), the `lsp-diagnostics` tool schema). Diagnostics is **one optional capability** alongside navigation, not part of the agent-loop spine. A provider swap does not change how the model asks for diagnostics.
+The diagnostics seam — a [capability seam](../../.agents/notes/archived/architecture/2026-07-15-lsp-capability-seam.md) exposing workspace-scoped diagnostics on one `ctx.lspDiagnostics` service, split across packages: Service Definition ([dsh-lsp-diagnostics](../../packages/lsp/lsp-diagnostics), `ctx.lspDiagnostics` + the provider registry), a generic Service Provider ([dsh-lsp-stdio-diagnostics](../../packages/lsp/lsp-stdio-diagnostics), a configured stdio diagnostics host), and Consumer ([dsh-tool-lsp-diagnostics](../../packages/lsp/tool-lsp-diagnostics), the `lsp-diagnostics` tool schema). Diagnostics is **one optional capability** alongside navigation, not part of the agent-loop spine. A provider swap does not change how the model asks for diagnostics.
 
 Source: [`packages/lsp/lsp-diagnostics/src/types.ts`](../../packages/lsp/lsp-diagnostics/src/types.ts)
 

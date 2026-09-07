@@ -6,7 +6,7 @@ Status: implemented
 
 ## 问题
 
-当前 harness 的精确导航（`goToDefinition`/`findReferences`/`goToImplementation`/`hover`）已通过瞬态打开的 seam 实现（`packages/lsp/lsp` + `packages/lsp/lsp-stdio` + `packages/lsp/tool-lsp`），但缺少诊断能力。[2026-07-15-lsp-capability-seam.md](../../implemented/architecture/2026-07-15-lsp-capability-seam.zh.md) 第 144 行刻意推迟的——“Diagnostics need separate freshness, accumulation, and transcript rules”——正是当前缺口。
+当前 harness 的精确导航（`goToDefinition`/`findReferences`/`goToImplementation`/`hover`）已通过瞬态打开的 seam 实现（`packages/lsp/lsp` + `packages/lsp/lsp-stdio` + `packages/lsp/tool-lsp`），但缺少诊断能力。[2026-07-15-lsp-capability-seam.md](../../archived/architecture/2026-07-15-lsp-capability-seam.md) 第 144 行刻意推迟的——“Diagnostics need separate freshness, accumulation, and transcript rules”——正是当前缺口。
 
 本决策的对比研究基础：
 

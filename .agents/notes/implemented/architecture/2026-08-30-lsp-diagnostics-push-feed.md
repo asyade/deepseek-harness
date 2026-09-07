@@ -6,7 +6,7 @@ English | [中文](2026-08-30-lsp-diagnostics-push-feed.zh.md)
 
 ## Problem
 
-The harness has precise navigation (`goToDefinition`/`findReferences`/`goToImplementation`/`hover`) via a transient-open seam at `packages/lsp/lsp` + `packages/lsp/lsp-stdio` + `packages/lsp/tool-lsp`, but has no diagnostics. The deferred line in [2026-07-15-lsp-capability-seam.md](../../implemented/architecture/2026-07-15-lsp-capability-seam.md) (line 144: "Diagnostics need separate freshness, accumulation, and transcript rules") is now the gap.
+The harness has precise navigation (`goToDefinition`/`findReferences`/`goToImplementation`/`hover`) via a transient-open seam at `packages/lsp/lsp` + `packages/lsp/lsp-stdio` + `packages/lsp/tool-lsp`, but has no diagnostics. The deferred line in [2026-07-15-lsp-capability-seam.md](../../archived/architecture/2026-07-15-lsp-capability-seam.md) (line 144: "Diagnostics need separate freshness, accumulation, and transcript rules") is now the gap.
 
 Comparison work grounding this note:
 

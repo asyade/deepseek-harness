@@ -88,7 +88,7 @@ export type SessionEvent<T extends SessionEventType = SessionEventType> = {
 }[T]
 ```
 
-Sources: [`packages/core/session/src/types.ts:385`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:393`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:422`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:453`](../packages/core/session/src/types.ts)
+Sources: [`packages/core/session/src/types.ts:406`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:414`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:443`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:474`](../packages/core/session/src/types.ts)
 
 ## Events
 
@@ -528,6 +528,38 @@ Source: [`packages/llm/llm-retry/src/types.ts:9`](../packages/llm/llm-retry/src/
 
 Source: [`packages/llm/llm-retry/src/types.ts:11`](../packages/llm/llm-retry/src/types.ts)
 
+### `lsp/*`
+
+<a id="lspdiagnostics--log-only"></a>
+
+#### `lsp/diagnostics` — log-only
+
+```ts persistence-catalog
+/**
+ * Latest LSP diagnostics for one workspace, grouped by file.
+ * `workspaceRoot` anchors the snapshot, `byFile` maps each file path to the
+ * diagnostics currently published for that file, and `at` is the snapshot
+ * timestamp in epoch milliseconds.
+ */
+'lsp/diagnostics': {
+  workspaceRoot: string
+  byFile: Record<
+    string,
+    Array<{
+      uri: string
+      range: { start: { line: number; character: number }; end: { line: number; character: number } }
+      severity?: 1 | 2 | 3 | 4
+      code?: string | number
+      source?: string
+      message: string
+    }>
+  >
+  at: number
+}
+```
+
+Source: [`packages/core/session/src/types.ts:365`](../packages/core/session/src/types.ts)
+
 ### `model/*`
 
 <a id="modelselection--log-only"></a>
@@ -687,7 +719,7 @@ Source: [`packages/schedule/schedule/src/types.ts:219`](../packages/schedule/sch
 'session/end-seed': { inherited?: true }
 ```
 
-Source: [`packages/core/session/src/types.ts:381`](../packages/core/session/src/types.ts)
+Source: [`packages/core/session/src/types.ts:402`](../packages/core/session/src/types.ts)
 
 <a id="sessiontitle--log-only"></a>
 

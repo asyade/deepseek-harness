@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/architecture/2026-08-30-lsp-diagnostics-push-feed.md
-2026-08-30-lsp-diagnostics-push-feed.md: c04bd9aba4b91e77fcac0715d3e0b4253c94bcdd
-2026-08-30-lsp-diagnostics-push-feed.zh.md: 958df2a5cd1ca15d68300ccb5a3632f9a743dc64
+2026-08-30-lsp-diagnostics-push-feed.md: 8f3057b661a6d19930d5280cfab41b83c339a72a
+2026-08-30-lsp-diagnostics-push-feed.zh.md: 63a1db97540352dddb67d400d39ef5865fd40824

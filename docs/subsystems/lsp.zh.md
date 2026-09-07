@@ -166,7 +166,7 @@ interface LspService {
 
 ## 诊断
 
-诊断 seam——一个[能力 seam](../../.agents/notes/implemented/architecture/2026-07-15-lsp-capability-seam.zh.md)，在单一 `ctx.lspDiagnostics` 服务上公开工作区范围的诊断，并拆分到多个包：Service Definition（[dsh-lsp-diagnostics](../../packages/lsp/lsp-diagnostics)，`ctx.lspDiagnostics` + 提供方注册表）、通用 Service Provider（[dsh-lsp-stdio-diagnostics](../../packages/lsp/lsp-stdio-diagnostics)，经过配置的 stdio 诊断宿主）和 Consumer（[dsh-tool-lsp-diagnostics](../../packages/lsp/tool-lsp-diagnostics)，即 `lsp-diagnostics` 工具 schema）。诊断是导航之外的**一项可选能力**，不属于 agent loop（智能体循环）主干。更换提供方不会改变模型请求诊断的方式。
+诊断 seam——一个[能力 seam](../../.agents/notes/archived/architecture/2026-07-15-lsp-capability-seam.md)，在单一 `ctx.lspDiagnostics` 服务上公开工作区范围的诊断，并拆分到多个包：Service Definition（[dsh-lsp-diagnostics](../../packages/lsp/lsp-diagnostics)，`ctx.lspDiagnostics` + 提供方注册表）、通用 Service Provider（[dsh-lsp-stdio-diagnostics](../../packages/lsp/lsp-stdio-diagnostics)，经过配置的 stdio 诊断宿主）和 Consumer（[dsh-tool-lsp-diagnostics](../../packages/lsp/tool-lsp-diagnostics)，即 `lsp-diagnostics` 工具 schema）。诊断是导航之外的**一项可选能力**，不属于 agent loop（智能体循环）主干。更换提供方不会改变模型请求诊断的方式。
 
 源文件：[`packages/lsp/lsp-diagnostics/src/types.ts`](../../packages/lsp/lsp-diagnostics/src/types.ts)
 

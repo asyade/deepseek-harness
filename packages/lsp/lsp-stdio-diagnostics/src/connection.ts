@@ -119,11 +119,6 @@ export class LspConnection {
     this.handle.stdout.on('data', (chunk: Buffer) => { this.onStdout(chunk) })
   }
 
-  /** The child process id. */
-  get pid(): number {
-    return this.handle.pid
-  }
-
   /** Retained stderr tail (bounded by the connection's stderr cap). */
   get stderrTail(): string {
     /* v8 ignore next -- the collect disposition always exposes a stderr reader; defensive. */
