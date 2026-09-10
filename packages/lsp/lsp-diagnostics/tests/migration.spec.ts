@@ -1,8 +1,25 @@
 import { describe, it, expect, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import LspDiagnostics, { LspDiagnosticsProviderId } from '../src/index.ts'
+import FsLocal from '@deepseek-ai/dsh-fs-local'
+import SubprocessLocal from '@deepseek-ai/dsh-subprocess-local'
+import * as StdioDiagnostics from '@deepseek-ai/dsh-lsp-stdio-diagnostics'
 
 describe('diagnostics migration contract', () => {
+  it('mounts the stdio adapter through the rc.2 optional-service boundary', async () => {
+    const ctx = new Context()
+    try {
+      await ctx.plugin(FsLocal)
+      await ctx.plugin(SubprocessLocal)
+      await ctx.plugin(LspDiagnostics)
+      // Resolution only: diagnostics are lazy, so this never starts a server.
+      await ctx.plugin(StdioDiagnostics, { servers: { test: {
+        command: process.execPath, args: [], extensionToLanguage: { '.ts': 'typescript' },
+      } } })
+    } finally {
+      await ctx.fiber.dispose()
+    }
+  })
   it('normalizes workspace requests and releases the provider on disposal', async () => {
     const ctx = new Context()
     await ctx.plugin(LspDiagnostics)

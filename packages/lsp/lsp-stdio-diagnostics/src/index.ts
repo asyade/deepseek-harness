@@ -192,9 +192,7 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     // (provider still functional but not discoverable via seam).
     // This scaffolding does not block on Phase 1 completion — consumers that need the seam should
     // depend on `@deepseek-ai/dsh-lsp-diagnostics`.
-    const diagnosticsService = (ctx as unknown as {
-      lspDiagnostics?: { registerProvider: (p: LspDiagnosticsProvider) => () => void }
-    }).lspDiagnostics
+    const diagnosticsService = ctx.get('lspDiagnostics')
     if (diagnosticsService === undefined) {
       // Fallback: no seam present — note dependency but still own lifecycle so typecheck and isolated tests pass.
       // Providers remain alive for direct use; registration is a no-op until the seam lands.
