@@ -55,6 +55,8 @@ import * as ToolPty from '@deepseek-ai/dsh-tool-terminal'
 import * as ToolGoal from '@deepseek-ai/dsh-tool-goal'
 import * as ToolSchedule from '@deepseek-ai/dsh-schedule'
 import Lsp from '@deepseek-ai/dsh-lsp'
+import LspDiagnostics from '@deepseek-ai/dsh-lsp-diagnostics'
+import * as ToolLspDiagnostics from '@deepseek-ai/dsh-tool-lsp-diagnostics'
 import * as ToolLsp from '@deepseek-ai/dsh-tool-lsp'
 import * as ToolSkill from '@deepseek-ai/dsh-tool-skill'
 import * as ToolSessionQuery from '@deepseek-ai/dsh-tool-session-query'
@@ -460,6 +462,17 @@ const TOOL_PACKAGES: ToolPackage[] = [
       + 'Version 1 accepts after_seconds, explicit absolute at, and bounded fixed-rate every_seconds, '
       + 'and discloses session-local delivery; '
       + 'management reads and mutations require the shared Session persistence barrier.',
+  },
+  {
+    pkg: '@deepseek-ai/dsh-tool-lsp-diagnostics',
+    dir: 'tool-lsp-diagnostics',
+    source: 'packages/lsp/tool-lsp-diagnostics/src/index.ts',
+    requires: ['ctx.tools', 'ctx.lspDiagnostics', 'ctx.systemPrompt'],
+    writes: ['tool/call', 'tool/result'],
+    async mount(ctx) {
+      await ctx.plugin(LspDiagnostics)
+      await ctx.plugin(ToolLspDiagnostics)
+    },
   },
   {
     pkg: '@deepseek-ai/dsh-tool-lsp',

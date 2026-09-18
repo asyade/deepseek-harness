@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 
 ## Summary
 
-`dsh-lsp-stdio-diagnostics` turns configured local language-server commands into providers on `ctx.lspDiagnostics`: give it a table of server commands and extension-to-language mappings, and agents get workspace-scoped diagnostics — errors, warnings, and hints — served by real language servers. One plugin instance registers one isolated diagnostics provider per configured server; each provider lazily starts one server process per workspace and keeps documents open (`didOpen`/`didChange`) for the lifetime of that workspace, serving a push+pull hybrid (publishDiagnostics plus `textDocument/diagnostic` and `workspace/diagnostic`) with debounced merge, dedupe, and caps. Servers and sources always live in the mounted filesystem and subprocess execution world. It is a generic host, not a language-server catalog or installer — deployments configure commands explicitly. This package trusts its configured servers and adds no sandbox of its own.
+`dsh-lsp-stdio-diagnostics` registers configured language servers as workspace diagnostics providers. Each provider lazily starts a process per workspace, keeps documents synchronized, and merges bounded push and pull diagnostics. Servers use the mounted filesystem and subprocess services. Deployments supply server commands and extension mappings; this package trusts those servers and adds no sandbox.
 
 ## Table of Contents
 
@@ -66,7 +66,7 @@ The `servers` record maps each stable provider id to one server command. The pro
 
 <a id="clippy-deployment-examples"></a>
 
-Clippy lints ride the same `ctx.lspDiagnostics` push-feed — no new seam. Both examples produce `LspDiagnostic{severity 1|2, code, message, range}` with the provider's debounced merge (`150 ms`), dedupe (`JSON.stringify({ code, severity, message, source, range })`), and caps (`20` per file, `5` files). See [GOAT research](../../../docs/research/2026-08-31-goat-lint-diagnostics.md#24-extended-cargo-clippy-diagnostic--is-it-relevant) and [LSP subsystem](../../../docs/subsystems/lsp.md#clippy-via-lsp--deployment-example).
+Clippy lints ride the same `ctx.lspDiagnostics` push-feed — no new seam. Both examples produce `LspDiagnostic{severity 1|2, code, message, range}` with the provider's debounced merge (`150 ms`), dedupe (`JSON.stringify({ code, severity, message, source, range })`), and caps (`20` per file, `5` files). See [LSP subsystem](../../../docs/subsystems/lsp.md).
 
 **rust-analyzer clippy (recommended for small workspaces):** configure `rust-analyzer` to run `cargo clippy` on save. Pin `msrv` in `clippy.toml` (or `[lints.clippy]` in `Cargo.toml`) and whitelist pedantic lints — never enable `pedantic`/`nursery`/`restriction` wholesale in CI.
 

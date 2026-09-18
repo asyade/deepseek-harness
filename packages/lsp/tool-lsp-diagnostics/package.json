@@ -1,7 +1,7 @@
 {
   "name": "@deepseek-ai/dsh-tool-lsp-diagnostics",
   "description": "Model-facing lsp-diagnostics tool over the DeepSeek Harness diagnostics seam (ctx.lspDiagnostics) \u2014 one read-only tool pulling the current diagnostics snapshot with 5 files\u00d720 per file capping, severity 1 default, and bounded rendering",
-  "version": "0.1.2-alpha.4",
+  "version": "0.1.6-alpha.2",
   "publishConfig": {
     "access": "public"
   },

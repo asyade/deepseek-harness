@@ -199,4 +199,44 @@ query(request: LspQueryRequest, signal?: AbortSignal): Promise<LspQueryResult>
 ```
 
 Source: [`packages/lsp/lsp/src/types.ts`](../../packages/lsp/lsp/src/types.ts)
+
+<a id="ctxlspdiagnostics--lspdiagnosticsservice"></a>
+
+### `ctx.lspDiagnostics` — `LspDiagnosticsService`
+
+The diagnostics capability seam (`ctx.lspDiagnostics`). Owns provider registration, workspace- canonical selection, normalized snapshot query, and push observation. Exposes no protocol escape hatch and no extension map.
+
+```ts cordis-catalog
+/**
+ * Register a diagnostics provider, atomically reserving its id. Any invalid input or duplicate id
+ * publishes nothing and throws `LspError` (`LSP_INVALID_PROVIDER` / `LSP_CONFLICT`); the returned
+ * disposer releases the reservation together with any workspace routing and push forwarding.
+ * Disposed with the calling fiber.
+ * @param provider - the backend to register.
+ * @returns a synchronous disposer releasing the id and provider subscription.
+ */
+registerProvider(provider: LspDiagnosticsProvider): () => void
+
+/**
+ * Select the provider and pull one snapshot for the workspace. The seam canonicalizes
+ * `workspaceRoot`; no match or empty workspace throws `LspError` `LSP_UNAVAILABLE` /
+ * `LSP_INVALID_PROVIDER`.
+ * @param request - workspace-scoped query (the seam canonicalizes `workspaceRoot`).
+ * @param signal - optional cancellation forwarded to the selected provider.
+ * @returns the normalized snapshot.
+ */
+diagnostics(request: LspDiagnosticsRequest, signal?: AbortSignal): Promise<LspDiagnosticsSnapshot>
+
+/**
+ * Subscribe to fresh push snapshots from the provider (debounced, per-workspace). Each emission
+ * is a full snapshot. Returns a disposer removing the listener.
+ * @param listener - called for each fresh snapshot.
+ * @returns a synchronous disposer.
+ */
+onDiagnostics(listener: (snapshot: LspDiagnosticsSnapshot) => void): () => void
+```
+
+Types: [LspDiagnosticsProvider](../../packages/lsp/lsp-diagnostics/README.zh.md) · [LspDiagnosticsRequest](../../packages/lsp/lsp-diagnostics/README.zh.md) · [LspDiagnosticsSnapshot](../../packages/lsp/lsp-diagnostics/README.zh.md)
+
+Source: [`packages/lsp/lsp-diagnostics/src/types.ts`](../../packages/lsp/lsp-diagnostics/src/types.ts)
 <!-- END GENERATED cordis-surface -->

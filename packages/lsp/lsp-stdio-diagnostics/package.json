@@ -1,7 +1,7 @@
 {
   "name": "@deepseek-ai/dsh-lsp-stdio-diagnostics",
   "description": "Stdio diagnostics provider for the DeepSeek Harness LSP diagnostics seam (ctx.lspDiagnostics) \u2014 persistent document sync, push (publishDiagnostics) + pull (textDocument/diagnostic + workspace/diagnostic) hybrid, debounced merge/dedupe/caps",
-  "version": "0.1.2-alpha.4",
+  "version": "0.1.6-alpha.2",
   "publishConfig": {
     "access": "public"
   },

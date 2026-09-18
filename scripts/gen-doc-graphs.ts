@@ -741,6 +741,15 @@ const SERVICE_ROLES: ServiceRole[] = [
     note: 'Provider adapters dispatch authenticated deliveries; trusted plugins register independent process-local rules, and the runtime turns non-null results into ordinary Workspace-backed Sessions without delivery or completion state.',
   },
   {
+    key: 'lspDiagnostics',
+    pkg: 'lsp-diagnostics',
+    title: 'Language-server diagnostics',
+    mode: 'seam',
+    implementations: ['lsp-stdio-diagnostics'],
+    consumers: ['tool-lsp-diagnostics'],
+    note: 'Workspace diagnostic snapshots and push subscriptions; the tool owns model-visible rendering.',
+  },
+  {
     key: 'lsp',
     pkg: 'lsp',
     title: 'Language-server navigation seam',

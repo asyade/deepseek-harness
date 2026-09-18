@@ -9,7 +9,7 @@ kind: "package-reference"
 
 ## 概述
 
-`dsh-lsp-stdio-diagnostics` 把配置好的本地语言服务器命令变成 `ctx.lspDiagnostics` 上的提供方：给它一张服务器命令与扩展名到语言映射的表，agent 就能获得由真实语言服务器支撑的工作区范围诊断——错误、警告与提示。一个插件实例为每个配置的服务器注册一个隔离的诊断提供方；每个提供方按工作区惰性启动一个服务器进程，并在该工作区存续期间保持文档打开（`didOpen`/`didChange`），以防抖合并、去重与截断提供推送+拉取混合（publishDiagnostics 加 `textDocument/diagnostic` 与 `workspace/diagnostic`）。服务器与源文件始终位于挂载的文件系统与子进程执行世界中。它是通用宿主，而非语言服务器目录或安装器——部署方显式配置命令。本包信任其配置的服务器，不附加自己的沙箱。
+`dsh-lsp-stdio-diagnostics` 将配置的语言服务器注册为工作区诊断提供方。每个提供方按工作区惰性启动进程，保持文档同步，并合并有界的推送和拉取诊断。服务器使用已挂载的文件系统和子进程服务。部署方提供服务器命令和扩展名映射；本包信任这些服务器，不额外提供沙箱。
 
 ## 目录
 
@@ -66,7 +66,7 @@ kind: "package-reference"
 
 <a id="clippy-deployment-examples"></a>
 
-Clippy lint 走同一条 `ctx.lspDiagnostics` 推送流——无需新 seam。两个示例都产生 `LspDiagnostic{severity 1|2, code, message, range}`，采用提供方的防抖合并（`150 ms`）、去重（`JSON.stringify({ code, severity, message, source, range })`）与截断（每文件 `20` 条、`5` 个文件）。参见 [GOAT 研究](../../../docs/research/2026-08-31-goat-lint-diagnostics.zh.md#24-extended-cargo-clippy-diagnostic--is-it-relevant) 与 [LSP 子系统](../../../docs/subsystems/lsp.zh.md#clippy-via-lsp--deployment-example)。
+Clippy lint 走同一条 `ctx.lspDiagnostics` 推送流——无需新 seam。两个示例都产生 `LspDiagnostic{severity 1|2, code, message, range}`，采用提供方的防抖合并（`150 ms`）、去重（`JSON.stringify({ code, severity, message, source, range })`）与截断（每文件 `20` 条、`5` 个文件）。参见 [LSP 子系统](../../../docs/subsystems/lsp.zh.md)。
 
 **rust-analyzer clippy（小工作区推荐）：** 将 `rust-analyzer` 配置为在保存时运行 `cargo clippy`。在 `clippy.toml`（或 `Cargo.toml` 的 `[lints.clippy]`）中固定 `msrv` 并白名单 pedantic lint——绝不在 CI 中整体启用 `pedantic`/`nursery`/`restriction`。
 

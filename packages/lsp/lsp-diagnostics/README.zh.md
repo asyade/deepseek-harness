@@ -9,7 +9,7 @@ kind: "package-reference"
 
 ## 概述
 
-`dsh-lsp-diagnostics` 提供 harness 的诊断 seam：agent 可以拉取当前工作区的诊断快照或订阅防抖后的推送快照；诊断服务（`ctx.lspDiagnostics`）把每个查询路由到已注册的诊断提供方。提供方以品牌化 id 注册，并按规范化的工作区根选择，因此更换提供方绝不会改变诊断的请求方式或模型所见。该服务只暴露类型化快照与推送订阅——无 JSON-RPC 逃生口、无文档或进程控制、无按扩展名的映射——且自身不贡献任何提示词或工具 schema——面向模型的 `lsp-diagnostics` 工具位于 `dsh-tool-lsp-diagnostics`。将其与 `dsh-lsp-stdio-diagnostics` 等提供方及工具组合，即可为 agent 提供拉取式诊断；本包单独存在时不做任何事。
+`dsh-lsp-diagnostics` 将工作区诊断查询和推送订阅路由到已注册的提供方。提供方使用品牌标识符，为规范化工作区根目录返回合并、去重的快照。服务本身不贡献提示词或工具 schema。将其与 `dsh-lsp-stdio-diagnostics` 和 `dsh-tool-lsp-diagnostics` 组合，即可向 agent 提供诊断。
 
 ## 目录
 

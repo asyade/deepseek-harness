@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 
 ## Summary
 
-`dsh-lsp-diagnostics` provides the harness's diagnostics seam: an agent can pull the current workspace diagnostics snapshot or subscribe to debounced push snapshots, and the diagnostics service (`ctx.lspDiagnostics`) routes each query to the registered diagnostics provider. Providers register by branded id and are selected by canonical workspace root, so a provider swap never changes how diagnostics are requested or what the model sees. The service exposes only a typed snapshot and a push subscription — no JSON-RPC escape hatch, no document or process controls, and no per-extension map — and it contributes no prompt or tool schema itself — the model-facing `lsp-diagnostics` tool lives in `dsh-tool-lsp-diagnostics`. Compose it with a provider such as `dsh-lsp-stdio-diagnostics` and the tool to give agents pull diagnostics; this package does nothing on its own.
+`dsh-lsp-diagnostics` routes workspace diagnostics queries and push subscriptions to registered providers. Providers have branded identifiers and return merged, deduplicated snapshots for a canonical workspace root. The service contributes no prompt or tool schema. Compose it with `dsh-lsp-stdio-diagnostics` and `dsh-tool-lsp-diagnostics` to expose diagnostics to agents.
 
 ## Table of Contents
 

@@ -1374,6 +1374,31 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'lspDiagnostics',
+    summary: 'The diagnostics capability seam (`ctx.lspDiagnostics`).',
+    description: 'The diagnostics capability seam (`ctx.lspDiagnostics`). Owns provider registration, workspace- canonical selection, normalized snapshot query, and push observation. Exposes no protocol escape hatch and no extension map.',
+    methods: [
+      {
+        signature: 'registerProvider(provider: LspDiagnosticsProvider): () => void',
+        description: 'Register a diagnostics provider, atomically reserving its id. Any invalid input or duplicate id publishes nothing and throws `LspError` (`LSP_INVALID_PROVIDER` / `LSP_CONFLICT`); the returned disposer releases the reservation together with any workspace routing and push forwarding. Disposed with the calling fiber.',
+        parameters: [{ name: 'provider', description: 'the backend to register.' }],
+        returns: 'a synchronous disposer releasing the id and provider subscription.',
+      },
+      {
+        signature: 'diagnostics(request: LspDiagnosticsRequest, signal?: AbortSignal): Promise<LspDiagnosticsSnapshot>',
+        description: 'Select the provider and pull one snapshot for the workspace. The seam canonicalizes `workspaceRoot`; no match or empty workspace throws `LspError` `LSP_UNAVAILABLE` / `LSP_INVALID_PROVIDER`.',
+        parameters: [{ name: 'request', description: 'workspace-scoped query (the seam canonicalizes `workspaceRoot`).' }, { name: 'signal', description: 'optional cancellation forwarded to the selected provider.' }],
+        returns: 'the normalized snapshot.',
+      },
+      {
+        signature: 'onDiagnostics(listener: (snapshot: LspDiagnosticsSnapshot) => void): () => void',
+        description: 'Subscribe to fresh push snapshots from the provider (debounced, per-workspace). Each emission is a full snapshot. Returns a disposer removing the listener.',
+        parameters: [{ name: 'listener', description: 'called for each fresh snapshot.' }],
+        returns: 'a synchronous disposer.',
+      },
+    ],
+  },
+  {
     key: 'mcpResources',
     summary: 'Scoped resource access plus three tools shared by configured MCP servers.',
     description: 'Scoped resource access plus three tools shared by configured MCP servers.',
@@ -5053,10 +5078,6 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export type LspOperation = \'goToDefinition\' | \'findReferences\' | \'goToImplementation\' | \'hover\';',
   },
   {
-    name: 'LspPosition',
-    declaration: 'export interface LspPosition {\n    readonly line: number;\n    readonly character: number;\n}',
-  },
-  {
     name: 'LspProvider',
     declaration: 'export interface LspProvider {\n    readonly id: LspProviderId;\n    readonly extensionToLanguage: Readonly<Record<string, string>>;\n    query(request: LspProviderQuery, signal?: AbortSignal): Promise<LspQueryResult>;\n}',
   },
@@ -5075,10 +5096,6 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'LspQueryResult',
     declaration: 'export type LspQueryResult = {\n    readonly kind: \'locations\';\n    readonly locations: readonly LspLocation[];\n    readonly resolvedWorkspaceUri: string;\n} | {\n    readonly kind: \'hover\';\n    readonly hover: LspHover | null;\n};',
-  },
-  {
-    name: 'LspRange',
-    declaration: 'export interface LspRange {\n    readonly start: LspPosition;\n    readonly end: LspPosition;\n}',
   },
   {
     name: 'ManagementError',

@@ -25,7 +25,9 @@ describe('diagnostics migration contract', () => {
     await ctx.plugin(LspDiagnostics)
     await expect(ctx.lspDiagnostics.diagnostics({ workspaceRoot: '/workspace' }))
       .rejects.toMatchObject({ code: 'LSP_UNAVAILABLE' })
-    const diagnostics = vi.fn(async ({ workspaceRoot }: { workspaceRoot: string }) => ({ workspaceRoot, diagnostics: [], timestamp: Date.now() }))
+    const diagnostics = vi.fn(async ({ workspaceRoot }: { workspaceRoot: string }) => ({
+      workspaceRoot, diagnostics: [], timestamp: Date.now(),
+    }))
     const unsubscribe = vi.fn()
     const provider = { id: LspDiagnosticsProviderId('migration'), diagnostics,
       onDiagnostics: vi.fn(() => unsubscribe) }
